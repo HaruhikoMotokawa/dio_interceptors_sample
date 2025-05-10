@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:dio_interceptors_sample/data/sources/pub_dev_http_client.dart';
+import 'package:dio_interceptors_sample/data/sources/http/client/pub_dev_http_client.dart';
 import 'package:dio_interceptors_sample/domain/models/package_names_response.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
