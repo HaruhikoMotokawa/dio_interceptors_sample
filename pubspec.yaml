@@ -24,12 +24,16 @@ dependencies:
     git:
       url: https://github.com/HaruhikoMotokawa/utility_widgets.git
       ref: v1.0.0
+  freezed: ^3.0.6
+  json_annotation: ^4.9.0
+  freezed_annotation: ^3.0.0
 
 dev_dependencies:
   build_runner:
   flutter_lints:
   flutter_test:
     sdk: flutter
+  json_serializable: ^6.8.0
   riverpod_generator:
   riverpod_lint:
 
