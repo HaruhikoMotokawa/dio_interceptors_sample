@@ -15,20 +15,22 @@ class PackageRepository {
   /// 人気パッケージを取得する
   Future<List<String>> fetchPopularPackages() async {
     final response =
-        await _dio.get<PackageNamesResponse>(_popularPackagesEndpoint);
+        await _dio.get<Map<String, dynamic>>(_popularPackagesEndpoint);
 
-    if (response.data case PackageNamesResponse(packages: final packages)) {
-      return packages;
+    if (response.data case final data?) {
+      final responseBody = PackageNamesResponse.fromJson(data);
+      return responseBody.packages;
     }
     return [];
   }
 
   /// 全パッケージを取得する
   Future<List<String>> fetchAllPackages() async {
-    final response = await _dio.get<PackageNamesResponse>(_allPackagesEndpoint);
+    final response = await _dio.get<Map<String, dynamic>>(_allPackagesEndpoint);
 
-    if (response.data case PackageNamesResponse(packages: final packages)) {
-      return packages;
+    if (response.data case final data?) {
+      final responseBody = PackageNamesResponse.fromJson(data);
+      return responseBody.packages;
     }
     return [];
   }
