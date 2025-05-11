@@ -19,16 +19,26 @@ class PokemonDetailScreen extends ConsumerWidget {
       ),
       body: switch (asyncPokemon) {
         AsyncData(value: final pokemon?) => SafeArea(
-            child: Column(
-              children: [
-                Text(pokemon.name),
-                Image.network(
-                  pokemon.sprites.frontDefault!,
-                  width: 100,
-                  height: 100,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('ポケモン名: ${pokemon.name}'),
+                    Image.network(
+                      scale: 0.1,
+                      pokemon.sprites.frontDefault!,
+                      width: 200,
+                      height: 200,
+                    ),
+                    Text(
+                      'ポケモンタイプ: '
+                      '${pokemon.types.map((e) => e.type.name).join(', ')}',
+                    ),
+                  ],
                 ),
-                Text(pokemon.types.map((e) => e.type.name).join(', ')),
-              ],
+              ),
             ),
           ),
         AsyncData() => SafeArea(
