@@ -1,7 +1,7 @@
 import 'package:dio_interceptors_sample/presentation/screens/home/screen.dart';
 import 'package:dio_interceptors_sample/presentation/screens/pokemon_detail/screen.dart';
 import 'package:dio_interceptors_sample/presentation/screens/pokemons/screen.dart';
-import 'package:dio_interceptors_sample/presentation/screens/pokemons_use_cache/screen.dart';
+import 'package:dio_interceptors_sample/presentation/screens/pokemons_with_interceptors/screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -40,12 +40,12 @@ final _goRouter = GoRouter(
         ),
         // Nested Screens 2
         GoRoute(
-          path: PokemonsUseCacheScreen.path,
-          name: PokemonsUseCacheScreen.name,
+          path: PokemonsWithInterceptorsScreen.path,
+          name: PokemonsWithInterceptorsScreen.name,
           pageBuilder: (context, state) {
             return MaterialPage(
               key: state.pageKey,
-              child: const PokemonsUseCacheScreen(),
+              child: const PokemonsWithInterceptorsScreen(),
             );
           },
           routes: [

@@ -1,5 +1,5 @@
 import 'package:dio_interceptors_sample/presentation/screens/pokemons/screen.dart';
-import 'package:dio_interceptors_sample/presentation/screens/pokemons_use_cache/screen.dart';
+import 'package:dio_interceptors_sample/presentation/screens/pokemons_with_interceptors/screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -28,9 +28,9 @@ class HomeScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.star),
-              title: const Text('Go to ${PokemonsUseCacheScreen.name}'),
+              title: const Text('Go to ${PokemonsWithInterceptorsScreen.name}'),
               trailing: const Icon(Icons.arrow_forward),
-              onTap: () => context.go(PokemonsUseCacheScreen.path),
+              onTap: () => context.go(PokemonsWithInterceptorsScreen.path),
             ),
           ],
         ),

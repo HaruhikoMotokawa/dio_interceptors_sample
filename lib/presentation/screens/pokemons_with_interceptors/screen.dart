@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class PokemonsUseCacheScreen extends ConsumerWidget {
-  const PokemonsUseCacheScreen({super.key});
+class PokemonsWithInterceptorsScreen extends ConsumerWidget {
+  const PokemonsWithInterceptorsScreen({super.key});
 
-  static const path = '/pokemons_use_cache';
-  static const name = 'PokemonsUseCacheScreen';
+  static const path = '/pokemons_with_interceptors';
+  static const name = 'PokemonsWithInterceptorsScreen';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,7 +24,7 @@ class PokemonsUseCacheScreen extends ConsumerWidget {
             itemCount: pokemons.length,
             itemBuilder: (context, index) {
               return ListTile(
-                leading: const Icon(Icons.person),
+                leading: const Icon(Icons.catching_pokemon),
                 title: Text(
                   'No.${index + 1}: ${pokemons[index].name}',
                   style: Theme.of(context).textTheme.titleLarge,
