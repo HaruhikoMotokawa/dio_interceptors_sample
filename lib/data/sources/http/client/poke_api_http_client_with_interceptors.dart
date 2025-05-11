@@ -19,8 +19,6 @@ Dio pokeApiHttpClientWithInterceptors(Ref ref) {
     if (kDebugMode) ...[
       FakeErrorInterceptor(),
     ],
-
-    // ここにInterceptorを追加
     NetworkRetryInterceptor(ref, dio),
     AuthErrorRetryInterceptor(ref, dio),
     CustomDioCacheInterceptor(ref),
