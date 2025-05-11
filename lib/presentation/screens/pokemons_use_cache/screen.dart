@@ -1,5 +1,7 @@
 import 'package:dio_interceptors_sample/data/repositories/poke/provider.dart';
+import 'package:dio_interceptors_sample/presentation/screens/pokemon_detail/screen.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class PokemonsUseCacheScreen extends ConsumerWidget {
@@ -21,9 +23,17 @@ class PokemonsUseCacheScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             itemCount: pokemons.length,
             itemBuilder: (context, index) {
-              return Text(
-                'No.${index + 1}: ${pokemons[index].name}',
-                style: Theme.of(context).textTheme.titleLarge,
+              return ListTile(
+                leading: const Icon(Icons.person),
+                title: Text(
+                  'No.${index + 1}: ${pokemons[index].name}',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                trailing: const Icon(Icons.arrow_forward),
+                onTap: () => context.go(
+                  '$path/${PokemonDetailScreen.path}',
+                  extra: pokemons[index].name,
+                ),
               );
             },
             separatorBuilder: (context, index) => const Divider(),
