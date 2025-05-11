@@ -1,28 +1,28 @@
-import 'package:dio_interceptors_sample/data/repositories/package/provider.dart';
+import 'package:dio_interceptors_sample/data/repositories/poke/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class AllPackagesScreen extends ConsumerWidget {
-  const AllPackagesScreen({super.key});
+class PokemonsUseCacheScreen extends ConsumerWidget {
+  const PokemonsUseCacheScreen({super.key});
 
-  static const path = '/all-packages';
-  static const name = 'AllPackagesScreen';
+  static const path = '/pokemons_use_cache';
+  static const name = 'PokemonsUseCacheScreen';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncAllPackages = ref.watch(allPackagesProvider);
+    final asyncPokemons = ref.watch(pokemonsWithInterceptorsProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(name),
       ),
-      body: switch (asyncAllPackages) {
-        AsyncData(value: final packages) => ListView.separated(
+      body: switch (asyncPokemons) {
+        AsyncData(value: final pokemons) => ListView.separated(
             padding: const EdgeInsets.all(16),
-            itemCount: packages.length,
+            itemCount: pokemons.length,
             itemBuilder: (context, index) {
               return Text(
-                'No.${index + 1}: ${packages[index]}',
+                'No.${index + 1}: ${pokemons[index].name}',
                 style: Theme.of(context).textTheme.titleLarge,
               );
             },

@@ -1,5 +1,5 @@
-import 'package:dio_interceptors_sample/presentation/screens/all_packages/screen.dart';
-import 'package:dio_interceptors_sample/presentation/screens/popular_packages/screen.dart';
+import 'package:dio_interceptors_sample/presentation/screens/pokemons/screen.dart';
+import 'package:dio_interceptors_sample/presentation/screens/pokemons_use_cache/screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,16 +21,16 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           children: [
             ListTile(
-              leading: const Icon(Icons.star),
-              title: const Text('Go to Popular Packages'),
+              leading: const Icon(Icons.list),
+              title: const Text('Go to ${PokemonsScreen.name}'),
               trailing: const Icon(Icons.arrow_forward),
-              onTap: () => context.push(PopularPackagesScreen.path),
+              onTap: () => context.push(PokemonsScreen.path),
             ),
             ListTile(
-              leading: const Icon(Icons.list),
-              title: const Text('Go to All Packages'),
+              leading: const Icon(Icons.star),
+              title: const Text('Go to ${PokemonsUseCacheScreen.name}'),
               trailing: const Icon(Icons.arrow_forward),
-              onTap: () => context.push(AllPackagesScreen.path),
+              onTap: () => context.push(PokemonsUseCacheScreen.path),
             ),
           ],
         ),
