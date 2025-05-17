@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mockito/mockito.dart';
 
-import '../../../../_mock/mock.mocks.dart';
+import '../../../../../_mock/mock.mocks.dart';
 
 void main() {
   late ProviderContainer container;
@@ -29,6 +29,10 @@ void main() {
     );
 
     interceptor = container.read(customDioCacheInterceptorProvider);
+  });
+
+  tearDown(() {
+    container.dispose();
   });
   group('onRequest', () {
     test('DioCacheInterceptor のonRequestが呼ばれる', () async {
