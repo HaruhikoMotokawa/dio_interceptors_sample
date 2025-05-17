@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_interceptors_sample/data/sources/http/interceptors/_fake_error/fake_error_interceptor.dart';
 import 'package:dio_interceptors_sample/data/sources/http/interceptors/retry/retry_interceptor.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -20,7 +21,11 @@ class AuthErrorRetryInterceptor extends Interceptor {
   RetryInterceptor get _interceptor =>
       ref.read(retryInterceptorProvider(dio, retryEvaluator: retryEvaluator));
 
-  bool retryEvaluator(DioException error, int attempt) {
+  /// 認証エラーのリトライを行うかどうかの評価関数
+  ///
+  /// AuthErrorRetryInterceptor内かテストのみで使用する
+  @visibleForTesting
+  static bool retryEvaluator(DioException error, int attempt) {
     if (error is FakeAuthErrorException) {
       return true;
     }

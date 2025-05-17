@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:dio_interceptors_sample/core/constant/constants.dart';
 import 'package:dio_interceptors_sample/core/log/logger.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,5 +17,6 @@ RetryInterceptor retryInterceptor(
     dio: dio,
     retryEvaluator: retryEvaluator,
     logPrint: logger.d,
+    retryDelays: Constants.dioRetryDelays,
   );
 }
