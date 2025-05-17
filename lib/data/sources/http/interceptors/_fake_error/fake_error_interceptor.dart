@@ -1,5 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:dio_interceptors_sample/core/log/logger.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'fake_error_interceptor.g.dart';
+
+@Riverpod(keepAlive: true)
+FakeErrorInterceptor fakeErrorInterceptor(Ref ref) => FakeErrorInterceptor();
 
 class FakeErrorInterceptor extends Interceptor {
   int _count = 0;
