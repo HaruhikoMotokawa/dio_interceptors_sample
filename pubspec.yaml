@@ -35,6 +35,7 @@ dev_dependencies:
   flutter_lints:
   flutter_test:
     sdk: flutter
+  http_mock_adapter: ^0.6.1
   json_serializable: ^6.8.0
   riverpod_generator:
   riverpod_lint:
