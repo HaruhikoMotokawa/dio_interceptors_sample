@@ -3,6 +3,7 @@ import 'package:dio_interceptors_sample/data/sources/http/interceptors/cache/cus
 import 'package:dio_interceptors_sample/data/sources/http/interceptors/cache/dio_cache_interceptor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../../../../_mock/mock.mocks.dart';
@@ -99,6 +100,49 @@ void main() {
 
       // 通常のエラーハンドラーが呼ばれないことを確認
       verifyNever(mockRequestHandler.next(any));
+    });
+  });
+  group('キャッシュの挙動確認', () {
+    /// 全体テストとは別のcontainerを使う
+    late ProviderContainer container;
+    late Dio dio;
+    late int fetchCount;
+    late CustomDioCacheInterceptor customDioCacheInterceptor;
+
+    setUp(() {
+      container = ProviderContainer();
+      dio = Dio();
+      fetchCount = 0;
+
+      customDioCacheInterceptor =
+          container.read(customDioCacheInterceptorProvider);
+
+      dio.interceptors.add(customDioCacheInterceptor);
+
+      DioAdapter(dio: dio).onGet(
+        '/test_api/test',
+        (server) {
+          fetchCount++;
+          server.reply(200, {'message': 'mocked response'});
+        },
+      );
+    });
+
+    tearDown(() {
+      container.dispose();
+    });
+
+    test('同じリクエストはキャッシュが使われ fetch されない', () async {
+      // 初回
+      final res1 = await dio.get<Map<String, dynamic>>('/test_api/test');
+      expect(res1.data?['message'], 'mocked response');
+
+      // 2回目
+      final res2 = await dio.get<Map<String, dynamic>>('/test_api/test');
+      expect(res2.data?['message'], 'mocked response');
+
+      // キャッシュを使っているので fetchCount は 1 のまま
+      expect(fetchCount, 1);
     });
   });
 }
