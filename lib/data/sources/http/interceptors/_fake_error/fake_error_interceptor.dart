@@ -13,15 +13,20 @@ class FakeErrorInterceptor extends Interceptor {
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    final authException = FakeAuthErrorException(
-      'FakeAuthErrorInterceptor: Simulating error #$_count',
-      response.requestOptions,
-    );
-
     final netWorkException = DioException(
       requestOptions: response.requestOptions,
       response: response,
-      type: DioExceptionType.sendTimeout,
+      type: DioExceptionType.badCertificate,
+    );
+
+    final authException = DioException.badResponse(
+      statusCode: 401,
+      requestOptions: response.requestOptions,
+      response: Response(
+        requestOptions: response.requestOptions,
+        statusCode: 401,
+        data: response.data,
+      ),
     );
     _count++;
     if (_count <= 2) {
@@ -43,19 +48,5 @@ class FakeErrorInterceptor extends Interceptor {
       // 正常であれば次のInterceptorに進む
       handler.next(response);
     }
-  }
-}
-
-// Fakeの認証エラーのException
-class FakeAuthErrorException extends DioException implements Exception {
-  FakeAuthErrorException(String message, RequestOptions? requestOptions)
-      : super(
-          message: message,
-          requestOptions: requestOptions ?? RequestOptions(),
-        );
-
-  @override
-  String toString() {
-    return 'FakeAuthErrorException: $message';
   }
 }

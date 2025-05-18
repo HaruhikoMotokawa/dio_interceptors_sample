@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:dio_interceptors_sample/data/sources/http/interceptors/_fake_error/fake_error_interceptor.dart';
 import 'package:dio_interceptors_sample/data/sources/http/interceptors/retry/retry_interceptor.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
@@ -26,7 +25,8 @@ class AuthErrorRetryInterceptor extends Interceptor {
   /// AuthErrorRetryInterceptor内かテストのみで使用する
   @visibleForTesting
   static bool retryEvaluator(DioException error, int attempt) {
-    if (error is FakeAuthErrorException) {
+    if (error.type == DioExceptionType.badResponse &&
+        error.response?.statusCode == 401) {
       return true;
     }
 

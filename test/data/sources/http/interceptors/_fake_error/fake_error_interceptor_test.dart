@@ -54,7 +54,7 @@ void main() {
       verify(mockResponseHandler.next(response)).called(1);
     });
 
-    test('レスポンスが１１回目と１２回目の時に FakeAuthErrorException をスローする', () async {
+    test('レスポンスが１１回目と１２回目の時に DioExceptionType.badResponse をスローする', () async {
       final response = Response(
         requestOptions: RequestOptions(path: '/test_api/test'),
         data: 'test',
@@ -69,28 +69,39 @@ void main() {
       // ここまでの呼び出しでrejectが２回呼ばれることを確認
       verify(
         mockResponseHandler.reject(
-          argThat(isA<DioException>()),
+          argThat(
+            isA<DioException>()
+                .having((e) => e.type, 'type', DioExceptionType.badCertificate),
+          ),
           true,
         ),
       ).called(2);
 
-      //ここまでの呼び出しでnextが8回呼ばれることを確認
+      // ここまでの呼び出しでnextが8回呼ばれることを確認
       verify(mockResponseHandler.next(response)).called(8);
 
-      // 11回目のレスポンスで FakeAuthErrorException がスローされることを確認
+      // 11回目のレスポンスで DioExceptionType.badResponse がスローされることを確認
       interceptor.onResponse(response, mockResponseHandler);
       verify(
         mockResponseHandler.reject(
-          argThat(isA<FakeAuthErrorException>()),
+          argThat(
+            isA<DioException>()
+                .having((e) => e.type, 'type', DioExceptionType.badResponse)
+                .having((e) => e.response?.statusCode, 'statusCode', 401),
+          ),
           true,
         ),
       ).called(1);
 
-      // 12回目のレスポンスで FakeAuthErrorException がスローされることを確認
+      // 12回目のレスポンスで DioExceptionType.badResponse がスローされることを確認
       interceptor.onResponse(response, mockResponseHandler);
       verify(
         mockResponseHandler.reject(
-          argThat(isA<FakeAuthErrorException>()),
+          argThat(
+            isA<DioException>()
+                .having((e) => e.type, 'type', DioExceptionType.badResponse)
+                .having((e) => e.response?.statusCode, 'statusCode', 401),
+          ),
           true,
         ),
       ).called(1);
