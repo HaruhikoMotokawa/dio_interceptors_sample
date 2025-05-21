@@ -10,7 +10,6 @@ DioCacheInterceptor dioCacheInterceptor(Ref ref) {
     options: CacheOptions(
       store: MemCacheStore(),
       maxStale: const Duration(minutes: 10),
-      allowPostMethod: true,
     ),
   );
 }
