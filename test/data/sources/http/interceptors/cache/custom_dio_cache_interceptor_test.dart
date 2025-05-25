@@ -3,10 +3,10 @@ import 'package:dio_interceptors_sample/data/sources/http/interceptors/cache/cus
 import 'package:dio_interceptors_sample/data/sources/http/interceptors/cache/dio_cache_interceptor.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../../../../_mock/mock.mocks.dart';
+import '../../../../../test_util/fetch_behavior_test_adapter.dart';
 
 void main() {
   late ProviderContainer container;
@@ -105,27 +105,34 @@ void main() {
   group('キャッシュの挙動確認', () {
     /// 全体テストとは別のcontainerを使う
     late ProviderContainer container;
-    late Dio dio;
-    late int fetchCount;
     late CustomDioCacheInterceptor customDioCacheInterceptor;
+    late Dio dio;
+    late FetchBehaviorTestAdapter dioHttpClientAdapter;
+    late int fetchCount;
+
+    const path = '/test_api/test';
+    const mockedResponse = 'mocked response';
 
     setUp(() {
       container = ProviderContainer();
-      dio = Dio();
       fetchCount = 0;
+      dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
+
+      dioHttpClientAdapter = FetchBehaviorTestAdapter(
+        onAttempt: (attempt) {
+          fetchCount = attempt;
+        },
+        responseData: mockedResponse,
+      );
 
       customDioCacheInterceptor =
           container.read(customDioCacheInterceptorProvider);
 
+      // customDioCacheInterceptor をDioに追加
       dio.interceptors.add(customDioCacheInterceptor);
 
-      DioAdapter(dio: dio).onGet(
-        '/test_api/test',
-        (server) {
-          fetchCount++;
-          server.reply(200, {'message': 'mocked response'});
-        },
-      );
+      // FetchBehaviorTestAdapterをDioのHttpClientAdapterに設定
+      dio.httpClientAdapter = dioHttpClientAdapter;
     });
 
     tearDown(() {
@@ -134,15 +141,28 @@ void main() {
 
     test('同じリクエストはキャッシュが使われ fetch されない', () async {
       // 初回
-      final res1 = await dio.get<Map<String, dynamic>>('/test_api/test');
-      expect(res1.data?['message'], 'mocked response');
+      final res1 = await dio.get<String>(path);
+      expect(res1.data, mockedResponse);
 
       // 2回目
-      final res2 = await dio.get<Map<String, dynamic>>('/test_api/test');
-      expect(res2.data?['message'], 'mocked response');
+      final res2 = await dio.get<String>(path);
+      expect(res2.data, mockedResponse);
 
       // キャッシュを使っているので fetchCount は 1 のまま
-      expect(fetchCount, 1);
+      expect(fetchCount, equals(1));
+    });
+    test('異なるリクエストはキャッシュが使われず fetch される', () async {
+      // 初回
+      final res1 = await dio.get<String>(path);
+      expect(res1.data, mockedResponse);
+
+      // 異なるリクエスト
+      final res2 = await dio.get<String>('/test_api/another_test');
+      // 異なるリクエストでもレスポンスは同じになるように今回はモックされている
+      expect(res2.data, mockedResponse);
+
+      // 異なるリクエストなので fetchCount は 2 になる
+      expect(fetchCount, equals(2));
     });
   });
 }

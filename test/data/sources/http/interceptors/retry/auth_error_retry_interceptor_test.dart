@@ -7,7 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mockito/mockito.dart';
 
 import '../../../../../_mock/mock.mocks.dart';
-import 'retry_check_adapter.dart';
+import '../../../../../test_util/fetch_behavior_test_adapter.dart';
 
 void main() {
   late ProviderContainer container;
@@ -46,6 +46,7 @@ void main() {
 
       verify(mockRetryInterceptor.onRequest(requestOptions, mockRequestHandler))
           .called(1);
+      verifyNever(mockResponseHandler.next(any));
     });
   });
   group('onResponse', () {
@@ -59,6 +60,7 @@ void main() {
 
       verify(mockRetryInterceptor.onResponse(response, mockResponseHandler))
           .called(1);
+      verifyNever(mockErrorHandler.next(any));
     });
   });
   group('onError', () {
@@ -76,20 +78,23 @@ void main() {
 
       verify(mockRetryInterceptor.onError(exception, mockErrorHandler))
           .called(1);
+      verifyNever(mockRequestHandler.next(any));
     });
   });
 
   group('リトライの挙動テスト', () {
     /// 全体テストとは別のcontainerを使う
     late ProviderContainer container;
-    late Dio dio;
-    late int callCount;
     late AuthErrorRetryInterceptor authErrorRetryInterceptor;
+    late Dio dio;
+    late int fetchCount;
 
+    const path = '/test_api/test';
     setUp(() {
-      dio = Dio();
       container = ProviderContainer();
-      callCount = 0;
+      fetchCount = 0;
+
+      dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
       authErrorRetryInterceptor =
           container.read(authErrorRetryInterceptorProvider(dio));
 
@@ -102,24 +107,26 @@ void main() {
 
     test('DioExceptionType.badResponse の場合、3回リトライされる', () async {
       // 検証用のHttpClientAdapterを作成
-      RetryCheckAdapter(
-        dio: dio,
+      final adapter = FetchBehaviorTestAdapter(
         onAttempt: (attempt) {
-          callCount++;
+          fetchCount = attempt;
         },
         dioException: DioException(
-          requestOptions: RequestOptions(path: '/test_api/test'),
+          requestOptions: RequestOptions(path: path),
           type: DioExceptionType.badResponse,
           response: Response(
-            requestOptions: RequestOptions(path: '/test_api/test'),
+            requestOptions: RequestOptions(path: path),
             statusCode: 401,
           ),
         ),
       );
 
+      // Dioにアダプターを設定
+      dio.httpClientAdapter = adapter;
+
       // 処理を実行し、最終的にDioExceptionがスローされることを確認
       await expectLater(
-        dio.get<dynamic>('/test_api/test'),
+        dio.get<String>(path),
         throwsA(
           isA<DioException>()
               .having((e) => e.response?.statusCode, 'statusCode', 401)
@@ -132,27 +139,29 @@ void main() {
       );
 
       // 初回１ + リトライ3回 = ４回行われている
-      expect(callCount, equals(4));
+      expect(fetchCount, equals(4));
     });
     test('DioExceptionType.badResponse以外 の場合は何もしない', () async {
       // 検証用のHttpClientAdapterを作成
-      RetryCheckAdapter(
-        dio: dio,
+      final adapter = FetchBehaviorTestAdapter(
         onAttempt: (attempt) {
-          callCount++;
+          fetchCount = attempt;
         },
         dioException: DioException(
-          requestOptions: RequestOptions(path: '/test_api/test'),
+          requestOptions: RequestOptions(path: path),
           type: DioExceptionType.connectionTimeout,
           response: Response(
-            requestOptions: RequestOptions(path: '/test_api/test'),
+            requestOptions: RequestOptions(path: path),
           ),
         ),
       );
 
+      // Dioにアダプターを設定
+      dio.httpClientAdapter = adapter;
+
       // 処理を実行し、最終的にDioExceptionがスローされることを確認
       await expectLater(
-        dio.get<dynamic>('/test_api/test'),
+        dio.get<String>(path),
         throwsA(
           isA<DioException>().having(
             (e) => e.type,
@@ -163,7 +172,7 @@ void main() {
       );
 
       // リトライは行われないので、1回だけ呼ばれる
-      expect(callCount, equals(1));
+      expect(fetchCount, equals(1));
     });
   });
 }
